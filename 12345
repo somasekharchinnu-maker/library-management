@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Library Management System</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #eef2f3;
+}
+
+/* HERO */
+.hero {
+    background-image: url("https://images.unsplash.com/photo-1524995997946-a1c2e315a42f");
+    background-size: cover;
+    background-position: center;
+    height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.hero h1 {
+    background: rgba(0,0,0,0.6);
+    padding: 15px 30px;
+    border-radius: 10px;
+}
+
+/* MAIN */
+.container {
+    max-width: 1200px;
+    margin: -40px auto 30px;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* STATS */
+.stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 25px;
+}
+
+.stat-box {
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color: white;
+    width: 30%;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* SECTIONS */
+.section {
+    margin-bottom: 30px;
+    padding: 20px;
+    border-radius: 10px;
+    background: #f9f9f9;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.section h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section img {
+    width: 40px;
+}
+
+input {
+    padding: 10px;
+    margin: 5px;
+    width: 200px;
+}
+
+button {
+    padding: 10px 15px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #764ba2;
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+th {
+    background: #667eea;
+    color: white;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HERO -->
+<div class="hero">
+    <h1>📚 Library Management System</h1>
+</div>
+
+<div class="container">
+
+<!-- STATISTICS -->
+<div class="stats">
+    <div class="stat-box">
+        <h3>Total Books</h3>
+        <span id="totalBooks">0</span>
+    </div>
+    <div class="stat-box">
+        <h3>Books Issued</h3>
+        <span id="issuedCount">0</span>
+    </div>
+    <div class="stat-box">
+        <h3>Books Returned</h3>
+        <span id="returnedCount">0</span>
+    </div>
+</div>
+
+<!-- ADD BOOK -->
+<div class="section">
+<h2><img src="https://cdn-icons-png.flaticon.com/512/29/29302.png"> Add Book</h2>
+<input id="bookId" placeholder="Book ID">
+<input id="bookName" placeholder="Book Name">
+<input id="author" placeholder="Author">
+<input id="quantity" type="number" placeholder="Quantity">
+<button onclick="addBook()">Add Book</button>
+</div>
+
+<!-- BOOKS LIST -->
+<div class="section">
+<h2><img src="https://cdn-icons-png.flaticon.com/512/2232/2232688.png"> Book Records</h2>
+<table>
+<thead>
+<tr><th>ID</th><th>Name</th><th>Author</th><th>Quantity</th></tr>
+</thead>
+<tbody id="booksTable"></tbody>
+</table>
+</div>
+
+<!-- ADD STUDENT -->
+<div class="section">
+<h2><img src="https://cdn-icons-png.flaticon.com/512/3135/3135810.png"> Add Student</h2>
+<input id="studentId" placeholder="Student ID">
+<input id="studentName" placeholder="Student Name">
+<button onclick="addStudent()">Add Student</button>
+</div>
+
+<!-- ISSUE BOOK -->
+<div class="section">
+<h2><img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png"> Issue Book</h2>
+<input id="issueBookId" placeholder="Book ID">
+<input id="issueStudentId" placeholder="Student ID">
+<button onclick="issueBook()">Issue</button>
+</div>
+
+<!-- RETURN BOOK -->
+<div class="section">
+<h2><img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png"> Return Book</h2>
+<input id="returnBookId" placeholder="Book ID">
+<button onclick="returnBook()">Return</button>
+</div>
+
+</div>
+
+<script>
+let books = JSON.parse(localStorage.getItem("books")) || {};
+let students = JSON.parse(localStorage.getItem("students")) || {};
+let issuedBooks = JSON.parse(localStorage.getItem("issuedBooks")) || {};
+let issuedCount = JSON.parse(localStorage.getItem("issuedCount")) || 0;
+let returnedCount = JSON.parse(localStorage.getItem("returnedCount")) || 0;
+
+function save(){
+    localStorage.setItem("books",JSON.stringify(books));
+    localStorage.setItem("students",JSON.stringify(students));
+    localStorage.setItem("issuedBooks",JSON.stringify(issuedBooks));
+    localStorage.setItem("issuedCount",issuedCount);
+    localStorage.setItem("returnedCount",returnedCount);
+}
+
+function clearInputs(...ids){
+    ids.forEach(id=>document.getElementById(id).value="");
+}
+
+function addBook(){
+    books[bookId.value]={name:bookName.value,author:author.value,quantity:+quantity.value};
+    save(); showBooks();
+    clearInputs("bookId","bookName","author","quantity");
+}
+
+function addStudent(){
+    students[studentId.value]=studentName.value;
+    save(); clearInputs("studentId","studentName");
+}
+
+function issueBook(){
+    let b=issueBookId.value, s=issueStudentId.value;
+    if(!books[b]||!students[s]||books[b].quantity<=0) return;
+    books[b].quantity--;
+    issuedBooks[b]={student:s,time:new Date().toLocaleString()};
+    issuedCount++;
+    save(); showBooks(); updateStats();
+    clearInputs("issueBookId","issueStudentId");
+}
+
+function returnBook(){
+    let b=returnBookId.value;
+    if(!issuedBooks[b]) return;
+    books[b].quantity++;
+    delete issuedBooks[b];
+    returnedCount++;
+    save(); showBooks(); updateStats();
+    clearInputs("returnBookId");
+}
+
+function showBooks(){
+    booksTable.innerHTML="";
+    let total=0;
+    for(let id in books){
+        total+=books[id].quantity;
+        booksTable.innerHTML+=`
+        <tr><td>${id}</td><td>${books[id].name}</td>
+        <td>${books[id].author}</td><td>${books[id].quantity}</td></tr>`;
+    }
+    totalBooks.textContent=total;
+}
+
+function updateStats(){
+    issuedCount.textContent=issuedCount;
+    returnedCount.textContent=returnedCount;
+}
+
+showBooks();
+updateStats();
+</script>
+
+</body>
+</html>
